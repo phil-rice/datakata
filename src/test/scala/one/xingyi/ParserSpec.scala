@@ -2,6 +2,7 @@ package one.xingyi
 
 import org.scalatest.{FlatSpec, Matchers}
 
+object ParserFixture extends ParserFixture
 trait ParserFixture {
   implicit val theParser: Parser[String] = s => "<" + s + ">"
 
@@ -13,7 +14,7 @@ trait ParserFixture {
 
 }
 
-class ParserSpec extends KataSpec with ParserFixture with Maker{
+class ParserSpec extends KataSpec with Maker {
   behavior of "implicit parsers"
 
   it should "have a parser for int" in {
@@ -25,7 +26,11 @@ class ParserSpec extends KataSpec with ParserFixture with Maker{
     implicitly[Parser[String]] apply "0" shouldBe "0"
     implicitly[Parser[String]] apply "3" shouldBe "3"
     implicitly[Parser[String]] apply " 3" shouldBe "3"
+
   }
+
+  import ParserFixture.theParser
+
   behavior of "ColumnData"
 
 
