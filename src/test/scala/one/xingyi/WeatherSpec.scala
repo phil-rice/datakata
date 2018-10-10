@@ -32,13 +32,6 @@ class WeatherSpec extends FlatSpec with Matchers with Maker {
 
   }
 
-  behavior of "implicit parsers"
-
-  it should "have a parser for int" in {
-    implicitly[Parser[Int]] apply "0" shouldBe 0
-    implicitly[Parser[Int]] apply "3" shouldBe 3
-    implicitly[Parser[Int]] apply " 3" shouldBe 3
-  }
 
   behavior of "parser with weather data"
 
@@ -47,23 +40,30 @@ class WeatherSpec extends FlatSpec with Matchers with Maker {
 
   }
 
-  behavior of "ripper"
+  val line1 = "junk1"
+  val line2 = "junk2"
+  val line3 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+  val line4 = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+  val junkEnd = "junkEnd"
+
+  behavior of "ripper stream modifier for Weather Data"
+
 
   it should "drop the first n lines, the last line then pass the rest to the parser making objects" in {
-    val line1 = "junk1"
-    val line2 = "junk2"
-    val line3 = "0123456789"
-    val line4 = "abcdefghij"
-    val junkEnd = "junkEnd"
-
-    Ripper(Seq(line1, line2, line3, line4, junkEnd)) shouldBe Seq("<0123456789>", "<abcdefghij>")
+    implicitly[RipperStreamModifier[WeatherData]] apply (Seq(line1, line2, line3, line4, junkEnd)) shouldBe Seq(line3, line4)
   }
 
+  behavior of "Ripper stream modified for WeatherData"
+
+
+  it should "drop the first two and the last" in {
+    implicitly[RipperStreamModifier[WeatherData]] apply (Seq(line1, line2, line3, line4, junkEnd)) shouldBe Seq(line3, line4)
+  }
 
   behavior of "ripper with real data"
 
   it should "read at least the first line of the weather data" in {
-    Ripper[WeatherData]("weather.dat") .take(1) shouldBe Seq(WeatherData(1,88,59))
+    Ripper[WeatherData]("weather.dat").take(1) shouldBe Seq(WeatherData(1, 88, 59))
   }
 
   behavior of "find smallest"
@@ -77,7 +77,7 @@ class WeatherSpec extends FlatSpec with Matchers with Maker {
   behavior of "find smallest spread"
 
   it should "Find the smallest weather" in {
-    FindSmallest[WeatherData](_.spread)(Ripper[WeatherData]("weather.dat"))shouldBe WeatherData(14,61,59)
+    FindSmallest[WeatherData](_.spread)(Ripper[WeatherData]("weather.dat")) shouldBe WeatherData(14, 61, 59)
   }
 
 }
