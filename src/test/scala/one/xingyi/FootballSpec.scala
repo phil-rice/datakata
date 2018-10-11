@@ -2,7 +2,7 @@ package one.xingyi
 
 import org.scalatest.{FlatSpec, Matchers}
 
-class FootballSpec extends FlatSpec with Matchers {
+class FootballSpec extends KataSpec {
 
   behavior of "FootballData"
 
